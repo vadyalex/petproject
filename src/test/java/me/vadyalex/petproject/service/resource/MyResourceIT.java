@@ -38,7 +38,7 @@ public class MyResourceIT {
 
         LOGGER.debug(" -> {}", body);
 
-        assertThat(body).isEqualToIgnoringCase("{\"test\":true}");
+        assertThat(body).isEqualToIgnoringCase("HELLO!");
     }
 
 }

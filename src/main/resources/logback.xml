@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <jmxConfigurator />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level[%date] %thread %logger: %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='p("petproject.env").equals("")'>
+        <then>
+            <root level="WARN">
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
+    <if condition='p("petproject.env").contains("dev")'>
+        <then>
+            <root level="DEBUG">
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
+    <if condition='p("petproject.env").contains("mock")'>
+        <then>
+            <root level="TRACE">
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
+
+
+</configuration>
