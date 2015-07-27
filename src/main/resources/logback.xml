@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true">
+<configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -23,7 +23,7 @@
     </if>
     <if condition='p("petproject.env").contains("mock")'>
         <then>
-            <root level="TRACE">
+            <root level="DEBUG">
                 <appender-ref ref="STDOUT" />
             </root>
         </then>

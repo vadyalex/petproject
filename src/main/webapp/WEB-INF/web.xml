@@ -5,10 +5,6 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
-    <listener>
-        <listener-class>me.vadyalex.petproject.service.configuration.EnvConfiguration</listener-class>
-    </listener>
-
     <filter>
         <filter-name>SparkFilter</filter-name>
         <filter-class>spark.servlet.SparkFilter</filter-class>
