@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import spark.Spark;
 import spark.servlet.SparkApplication;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 public class Configuration implements SparkApplication, AutoCloseable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
@@ -39,6 +42,36 @@ public class Configuration implements SparkApplication, AutoCloseable {
                 "/myresource",
                 new MyResource(repository),
                 o -> new Gson().toJson(o)
+        );
+
+
+        Spark.get(
+                "/@deployment",
+                (request, response) -> {
+
+                    final InputStream stream = Configuration.class.getClassLoader().getResourceAsStream("deployment.properties");
+
+                    if (stream != null) {
+                        final Properties properties = new Properties();
+                        properties.load(stream);
+
+                        return properties
+                                .entrySet()
+                                .stream()
+                                .map(
+                                        entry -> entry.getKey() + ":" + entry.getValue() + '\n'
+                                )
+                                .reduce(
+                                        new StringBuilder("\n@deployment\n"),
+                                        StringBuilder::append,
+                                        StringBuilder::append
+                                )
+                                .toString();
+
+                    }
+
+                    return "\n@deployment\n";
+                }
         );
 
     }
