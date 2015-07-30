@@ -14,6 +14,11 @@
     </scm>
 
     <properties>
+        <deployment.version>v1</deployment.version>
+
+        <integration.test.port>9080</integration.test.port>
+        <integration.test.jetty.stop.port>9966</integration.test.jetty.stop.port>
+
         <!-- Maven properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -56,7 +61,11 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3.1</version>
+        </dependency>
 
         <!-- TEST DEPENDENCIES -->
         <dependency>
@@ -110,16 +119,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <classifier>${buildNumber}</classifier>
-                    <warName>${project.artifactId}-${project.version}</warName>
-                    <!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <version>1.2</version>
@@ -138,6 +137,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <classifier>${buildNumber}</classifier>
+                    <warName>${project.artifactId}-${project.version}</warName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
@@ -152,11 +160,18 @@
                                     <format property="DEPLOY_VERSION" pattern="yyMMddHHmmss"/>
                                     <format property="DATETIME" pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </tstamp>
-                                <echo file="${project.build.outputDirectory}/DEPLOY-VERSION.${DEPLOY_VERSION}"/>
+                                <echo file="${project.build.outputDirectory}/DEPLOYMENT-VERSION.${DEPLOY_VERSION}"/>
                                 <echo file="${project.build.outputDirectory}/deployment.properties">
                                     built=${DATETIME}
-                                    deploy.version=${DEPLOY_VERSION}
+                                    version=${DEPLOY_VERSION}
                                     revision=${buildNumber}
+                                </echo>
+                                <echo file="${project.build.outputDirectory}/deployment.json">
+                                    {
+                                        "built" : "${DATETIME}",
+                                        "version" : "${DEPLOY_VERSION}",
+                                        "revision" : "${buildNumber}"
+                                    }
                                 </echo>
                             </target>
                         </configuration>
@@ -201,11 +216,11 @@
                 <version>9.2.10.v20150310</version>
                 <configuration>
                     <httpConnector>
-                        <port>9080</port>
+                        <port>${integration.test.port}</port>
                     </httpConnector>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
-                    <stopPort>9966</stopPort>
+                    <stopPort>${integration.test.jetty.stop.port}</stopPort>
                     <stopWait>10</stopWait>
                     <webApp>
                         <contextPath>/</contextPath>

@@ -1,7 +1,10 @@
 package me.vadyalex.petproject.service.configuration;
 
 
+import com.google.gson.Gson;
 import me.vadyalex.petproject.service.resource.MyResource;
+import me.vadyalex.petproject.service.service.Repository;
+import me.vadyalex.petproject.service.service.StorageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Spark;
@@ -16,17 +19,26 @@ public class Configuration implements SparkApplication, AutoCloseable {
 
         final String PETPROJECT_ENV = System.getProperty("petproject.env");
 
-        if (PETPROJECT_ENV == null) {
-            LOGGER.info("PRODUCTION ENVIRONMENT");
-        } else if (PETPROJECT_ENV.equalsIgnoreCase("dev")) {
-            LOGGER.info("LOCAL DEVELOPMENT ENVIRONMENT");
-        } else if (PETPROJECT_ENV.equalsIgnoreCase("mock")) {
-            LOGGER.info("MOCKED INTEGRATION TEST");
+        switch (PETPROJECT_ENV) {
+            case "dev": {
+                LOGGER.info("LOCAL DEVELOPMENT ENVIRONMENT");
+                break;
+            }
+            case "mock": {
+                LOGGER.info("MOCKED INTEGRATION TEST");
+                break;
+            }
+            default: {
+                LOGGER.info("PRODUCTION ENVIRONMENT");
+            }
         }
+
+        final Repository repository = new StorageRepository();
 
         Spark.get(
                 "/myresource",
-                new MyResource()
+                new MyResource(repository),
+                o -> new Gson().toJson(o)
         );
 
     }

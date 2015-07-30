@@ -36,9 +36,9 @@ public class MyResourceIT {
 
         final String body = response.getBody(String.class);
 
-        LOGGER.debug(" -> {}", body);
+        LOGGER.info(" -> {}", body);
 
-        assertThat(body).isEqualToIgnoringCase("HELLO!");
+        assertThat(body).isEqualToIgnoringCase("{\"message\":\"HELLO!\"}");
     }
 
 }

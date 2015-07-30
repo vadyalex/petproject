@@ -1,5 +1,6 @@
 package me.vadyalex.petproject.service.resource;
 
+import com.google.common.collect.ImmutableMap;
 import me.vadyalex.petproject.service.service.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +14,18 @@ public class MyResource implements Route {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MyResource.class);
 
-/*
     private final Repository repository;
 
     public MyResource(Repository repository) {
         this.repository = Objects.requireNonNull(repository);
     }
-*/
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
         LOGGER.info("Serving content..");
 
-//        return repository.get();
-        return "HELLO!";
+        return ImmutableMap.of(
+                "message", repository.get()
+        );
     }
 }
