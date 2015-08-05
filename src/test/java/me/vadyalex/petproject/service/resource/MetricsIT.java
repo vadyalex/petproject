@@ -16,9 +16,9 @@ import static com.eclipsesource.restfuse.Assert.assertOk;
 
 @RunWith(HttpJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class DeploymentIT {
+public class MetricsIT {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(DeploymentIT.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(MetricsIT.class);
 
     public static final String SERVER = "http://localhost";
     public static final String port = System.getProperty("integration.test.port");
@@ -30,11 +30,13 @@ public class DeploymentIT {
     private Response response; // will be injected after every request
 
 
-    @HttpTest(method = Method.GET, path = "@deployment", type = MediaType.APPLICATION_JSON)
+    @HttpTest(method = Method.GET, path = "@metrics", type = MediaType.APPLICATION_JSON)
     public void an_initial_count() {
         assertOk(response);
 
         final String body = response.getBody(String.class);
+
+        Assertions.assertThat(body).contains("me.vadyalex.petproject.service.resource.MyResource");
     }
 
 }

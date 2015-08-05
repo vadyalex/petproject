@@ -1,10 +1,12 @@
 package me.vadyalex.petproject.service.configuration;
 
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.google.gson.Gson;
 import me.vadyalex.petproject.service.resource.Deployment;
 import me.vadyalex.petproject.service.resource.Healthcheck;
+import me.vadyalex.petproject.service.resource.Metrics;
 import me.vadyalex.petproject.service.resource.MyResource;
 import me.vadyalex.petproject.service.service.Repository;
 import me.vadyalex.petproject.service.service.StorageRepository;
@@ -40,9 +42,11 @@ public class Configuration implements SparkApplication, AutoCloseable {
 
         final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
+        final MetricRegistry metricRegistry = new MetricRegistry();
+
         Spark.get(
                 "/myresource",
-                new MyResource(healthCheckRegistry, repository),
+                new MyResource(healthCheckRegistry, metricRegistry, repository),
                 o -> new Gson().toJson(o)
         );
 
@@ -55,6 +59,12 @@ public class Configuration implements SparkApplication, AutoCloseable {
         Spark.get(
                 "/@healthcheck",
                 new Healthcheck(healthCheckRegistry)
+        );
+
+        Spark.get(
+                "/@metrics",
+                new Metrics(metricRegistry),
+                o -> new Gson().toJson(o)
         );
 
     }

@@ -1,5 +1,7 @@
 package me.vadyalex.petproject.service.resource;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.google.common.collect.ImmutableMap;
@@ -16,10 +18,10 @@ public class MyResource implements Route {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MyResource.class);
 
+    private final Meter meter;
     private final Repository repository;
 
-    public MyResource(final HealthCheckRegistry healthCheckRegistry, final Repository repository) {
-        this.repository = Objects.requireNonNull(repository);
+    public MyResource(final HealthCheckRegistry healthCheckRegistry, MetricRegistry metricRegistry, final Repository repository) {
         Objects
                 .requireNonNull(healthCheckRegistry)
                 .register(
@@ -33,11 +35,19 @@ public class MyResource implements Route {
                             }
                         }
                 );
+
+        this.meter = Objects
+                .requireNonNull(metricRegistry)
+                .meter(
+                        MyResource.class.getName()
+                );
+
+        this.repository = Objects.requireNonNull(repository);
     }
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        LOGGER.info("Serving content..");
+        meter.mark();
 
         return ImmutableMap.of(
                 "message", repository.get()
