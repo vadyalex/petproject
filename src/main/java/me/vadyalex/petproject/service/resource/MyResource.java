@@ -1,5 +1,7 @@
 package me.vadyalex.petproject.service.resource;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.codahale.metrics.health.HealthCheckRegistry;
 import com.google.common.collect.ImmutableMap;
 import me.vadyalex.petproject.service.service.Repository;
 import org.slf4j.Logger;
@@ -16,8 +18,21 @@ public class MyResource implements Route {
 
     private final Repository repository;
 
-    public MyResource(Repository repository) {
+    public MyResource(final HealthCheckRegistry healthCheckRegistry, final Repository repository) {
         this.repository = Objects.requireNonNull(repository);
+        Objects
+                .requireNonNull(healthCheckRegistry)
+                .register(
+                        MyResource.class.getName(),
+                        new HealthCheck() {
+                            protected Result check() throws Exception {
+                                return repository.get().isEmpty()?
+                                        Result.unhealthy("REPOSITORY IS NOT AVAILABLE")
+                                        :
+                                        Result.healthy();
+                            }
+                        }
+                );
     }
 
     @Override

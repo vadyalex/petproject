@@ -1,7 +1,10 @@
 package me.vadyalex.petproject.service.configuration;
 
 
+import com.codahale.metrics.health.HealthCheckRegistry;
 import com.google.gson.Gson;
+import me.vadyalex.petproject.service.resource.Deployment;
+import me.vadyalex.petproject.service.resource.Healthcheck;
 import me.vadyalex.petproject.service.resource.MyResource;
 import me.vadyalex.petproject.service.service.Repository;
 import me.vadyalex.petproject.service.service.StorageRepository;
@@ -9,9 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Spark;
 import spark.servlet.SparkApplication;
-
-import java.io.InputStream;
-import java.util.Properties;
 
 public class Configuration implements SparkApplication, AutoCloseable {
 
@@ -38,40 +38,23 @@ public class Configuration implements SparkApplication, AutoCloseable {
 
         final Repository repository = new StorageRepository();
 
+        final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
+
         Spark.get(
                 "/myresource",
-                new MyResource(repository),
+                new MyResource(healthCheckRegistry, repository),
                 o -> new Gson().toJson(o)
+        );
+
+        Spark.get(
+                "/@deployment",
+                new Deployment()
         );
 
 
         Spark.get(
-                "/@deployment",
-                (request, response) -> {
-
-                    final InputStream stream = Configuration.class.getClassLoader().getResourceAsStream("deployment.properties");
-
-                    if (stream != null) {
-                        final Properties properties = new Properties();
-                        properties.load(stream);
-
-                        return properties
-                                .entrySet()
-                                .stream()
-                                .map(
-                                        entry -> entry.getKey() + ":" + entry.getValue() + '\n'
-                                )
-                                .reduce(
-                                        new StringBuilder("\n@deployment\n"),
-                                        StringBuilder::append,
-                                        StringBuilder::append
-                                )
-                                .toString();
-
-                    }
-
-                    return "\n@deployment\n";
-                }
+                "/@healthcheck",
+                new Healthcheck(healthCheckRegistry)
         );
 
     }
