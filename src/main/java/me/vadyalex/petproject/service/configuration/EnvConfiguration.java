@@ -1,9 +1,9 @@
 package me.vadyalex.petproject.service.configuration;
 
 
-import com.google.inject.AbstractModule;
 import me.vadyalex.petproject.service.service.Repository;
 import me.vadyalex.petproject.service.service.StorageRepository;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.io.Closeable;
 /**
  * Created by vadyalex.
  */
-public class EnvConfiguration extends AbstractModule implements Closeable {
+public class EnvConfiguration extends AbstractBinder implements Closeable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(EnvConfiguration.class);
 
@@ -29,7 +29,7 @@ public class EnvConfiguration extends AbstractModule implements Closeable {
             LOGGER.info("MOCKED INTEGRATION TEST");
         }
 
-        bind(Repository.class).to(StorageRepository.class).asEagerSingleton();
+        bind(StorageRepository.class).to(Repository.class);
     }
 
     @Override
