@@ -25,15 +25,12 @@ public class EnvConfiguration extends AbstractBinder implements Closeable {
 
         if (PETPROJECT_ENV == null) {
             LOGGER.info("PRODUCTION ENVIRONMENT");
-            bind(Executors.newFixedThreadPool(10)).to(ExecutorService.class);
 
         } else if (PETPROJECT_ENV.equalsIgnoreCase("dev")) {
             LOGGER.info("LOCAL DEVELOPMENT ENVIRONMENT");
-            bind(Executors.newFixedThreadPool(10)).to(ExecutorService.class);
 
         } else if (PETPROJECT_ENV.equalsIgnoreCase("mock")) {
             LOGGER.info("MOCKED INTEGRATION TEST");
-            bind(Executors.newSingleThreadExecutor()).to(ExecutorService.class);
 
         }
 
